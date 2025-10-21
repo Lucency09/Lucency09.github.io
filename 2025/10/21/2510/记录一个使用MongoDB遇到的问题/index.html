@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="问题背景 MongoDB有两个使用特性：其一为每行记录的列元素可以无需建 表时定义，随时删减，该特性在用于记录类场景下非常好用；其二 为所存储的文档(类似sql中的行元素)是类似与json的格式，支持 嵌套索引，就像这样： 1234567891011121314&#123;     &quot;_id&quot; : &quot;AB16105869340072961&quot;,     &amp;qu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记录一个使用MongoDB遇到的问题">
+<meta property="og:url" content="https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:site_name" content="小桃棉花公主的技术站点">
+<meta property="og:description" content="问题背景 MongoDB有两个使用特性：其一为每行记录的列元素可以无需建 表时定义，随时删减，该特性在用于记录类场景下非常好用；其二 为所存储的文档(类似sql中的行元素)是类似与json的格式，支持 嵌套索引，就像这样： 1234567891011121314&#123;     &quot;_id&quot; : &quot;AB16105869340072961&quot;,     &amp;qu">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-10-21T14:34:49.000Z">
+<meta property="article:modified_time" content="2025-10-21T16:32:10.295Z">
+<meta property="article:author" content="小桃棉花公主">
+<meta property="article:tag" content="技术笔记">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/R2nmBzIIH50h80h8.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/R2nmBzIIH50h80h8.jpg" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/R2nmBzIIH50h80h8.jpg">
+        
+      
+    
+    <!-- title -->
+    <title>记录一个使用MongoDB遇到的问题</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- KaTeX for math rendering -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+	
+	<!-- custom blockquote styles -->
+	<style>
+		.content blockquote {
+			margin: 1rem 10px !important;
+			padding: 0.5em 10px !important;
+			background: #fff9e6 !important;
+			color: #666 !important;
+			font-weight: bold !important;
+			border-left: 4px solid #ff4444 !important;
+			font-style: italic !important;
+			quotes: none !important;
+		}
+		
+		.content blockquote:before {
+			content: none !important;
+			display: none !important;
+		}
+		
+		.content blockquote p {
+			margin: 0 !important;
+		}
+		
+		.content blockquote blockquote {
+			margin-left: 1rem !important;
+			border-left-color: #ff6666 !important;
+			color: #999 !important;
+			background: #fffaed !important;
+		}
+		
+		.content blockquote blockquote:before {
+			content: none !important;
+			display: none !important;
+		}
+	</style>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/Lucency09">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2025/08/02/2508/%E8%B5%84%E6%BA%90%E7%AB%99%E5%90%88%E9%9B%86/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <!-- <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li> -->
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&text=记录一个使用MongoDB遇到的问题"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&title=记录一个使用MongoDB遇到的问题"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&is_video=false&description=记录一个使用MongoDB遇到的问题"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=记录一个使用MongoDB遇到的问题&body=Check out this article: https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&title=记录一个使用MongoDB遇到的问题"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&title=记录一个使用MongoDB遇到的问题"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&title=记录一个使用MongoDB遇到的问题"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&title=记录一个使用MongoDB遇到的问题"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&name=记录一个使用MongoDB遇到的问题&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&t=记录一个使用MongoDB遇到的问题"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">问题背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95"><span class="toc-number">2.</span> <span class="toc-text">问题记录</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        记录一个使用MongoDB遇到的问题
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">小桃棉花公主</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-10-21T14:34:49.000Z" class="dt-published" itemprop="datePublished">2025-10-21</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" rel="tag">技术笔记</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h3 id="问题背景">问题背景</h3>
+<p>MongoDB有两个使用特性：其一为每行记录的列元素可以无需建
+表时定义，随时删减，该特性在用于记录类场景下非常好用；其二
+为所存储的文档(类似sql中的行元素)是类似与json的格式，支持
+嵌套索引，就像这样：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> </span><br><span class="line">    <span class="attr">&quot;_id&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;AB16105869340072961&quot;</span><span class="punctuation">,</span> </span><br><span class="line">    <span class="attr">&quot;info&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;payment_bank_code&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;BRI&quot;</span><span class="punctuation">,</span> </span><br><span class="line">        <span class="attr">&quot;order_status&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;COMPLETED&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#123;</span> </span><br><span class="line">    <span class="attr">&quot;_id&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;AB16105869340072962&quot;</span><span class="punctuation">,</span> </span><br><span class="line">    <span class="attr">&quot;info&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;payment_bank_code&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;target&quot;</span><span class="punctuation">,</span> </span><br><span class="line">        <span class="attr">&quot;order_status&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;COMPLETED&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>且其在对记录进行操作时能使用 <strong>.</strong> 查询嵌套索引，例如可以
+使用<code> info.payment_bank_code</code>去查询对应值，这次问题
+就是这两个特性作用下导致的。</p>
+<hr>
+<h3 id="问题记录">问题记录</h3>
+<p>业务场景是一个后端的go服务回去截获和记录两台机器之间的通信
+记录。通信消息的格式整体是固定的，被分为消息名称和消息参数
+两部分，这里问题在消息名称这部分，消息名称中会存在.符号，
+例如<code>protoclass1.protoxxxx</code>，在插入一条新纪录时不
+会有问题，数据库中会以下述形式进行存储：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;12345abcedfg&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;protoclass1.protoxxxx&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;args&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;arg1&quot;</span><span class="punctuation">:</span> <span class="string">&quot;1&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;arg2&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;x&quot;</span><span class="punctuation">:</span> <span class="string">&quot;1&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;y&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>但一旦需要对某条记录进行修改(这里是以name
+为匹配条件)，例如更新上述名称为<code>protoclass1.protoxxxx</code>的<code>args</code>值</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">filter := bson.M&#123;<span class="string">&quot;name&quot;</span>: <span class="string">&quot;protoclass1.protoxxxx&quot;</span>&#125;</span><br><span class="line">update := bson.M&#123;<span class="string">&quot;$set&quot;</span>: bson.M&#123;<span class="string">&quot;args&quot;</span>: <span class="string">&quot;xxxxx&quot;</span>&#125;&#125;</span><br><span class="line">result, err := collection.UpdateMany(cxt, filter, update)</span><br></pre></td></tr></table></figure>
+<p>由于<code>update</code>中<code>$set</code>(此为更新必要关键字)的存在，会触发mongodb
+中对key嵌套解析的机制，最终结果为数据库中会同时存在两行(两份文档)：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;12345abcedfg&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;protoclass1.protoxxxx&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;args&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;arg1&quot;</span><span class="punctuation">:</span> <span class="string">&quot;1&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;arg2&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;x&quot;</span><span class="punctuation">:</span> <span class="string">&quot;1&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;y&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;12345abcedfgddd&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;protoclass1&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;protoxxxx&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;args&quot;</span><span class="punctuation">:</span> <span class="string">&quot;xxxxx&quot;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">    </span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>这明显不是我希望的，尝试过使用<code>\02e</code>代替<code>.</code>，没有生效，最终只能以查询
+、删除、重新插入的方法进行更新，但如果遇到批量更新的情况预计会造成性能问题。</p>
+<hr>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+          <li><a href="/archives/">归档</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/Lucency09">项目</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">问题背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95"><span class="toc-number">2.</span> <span class="toc-text">问题记录</span></a></li></ol>
+      </div>
+    
+
+    <!-- <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&text=记录一个使用MongoDB遇到的问题"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&title=记录一个使用MongoDB遇到的问题"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&is_video=false&description=记录一个使用MongoDB遇到的问题"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=记录一个使用MongoDB遇到的问题&body=Check out this article: https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&title=记录一个使用MongoDB遇到的问题"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&title=记录一个使用MongoDB遇到的问题"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&title=记录一个使用MongoDB遇到的问题"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&title=记录一个使用MongoDB遇到的问题"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&name=记录一个使用MongoDB遇到的问题&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://lucency09.github.io/2025/10/21/2510/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%AA%E4%BD%BF%E7%94%A8MongoDB%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/&t=记录一个使用MongoDB遇到的问题"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div> -->
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <!-- <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a> -->
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2025
+    小桃棉花公主
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/Lucency09">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
