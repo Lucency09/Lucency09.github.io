@@ -206,6 +206,13 @@
 <h2 id="WSL相关">WSL相关</h2>
 <p>nv驱动位置</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib/wsl/lib/nvidia-smi</span><br></pre></td></tr></table></figure>
+<p>VSCode连接WSL报错 WebSocket close with status code 1006 解决方法</p>
+<p>方法1：重启WSL和VSCode</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wsl --shutdown</span><br><span class="line"><span class="comment"># 然后重新打开VSCode并重新连接WSL</span></span><br></pre></td></tr></table></figure>
+<p>方法2：删除VSCode服务器文件夹（在WSL中执行）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">rm</span> -rf ~/.vscode-server</span><br></pre></td></tr></table></figure>
+<p>方法3：检查并启动Windows主机网络服务（在PowerShell管理员模式下执行）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Set-Service hns -StartupType Automatic</span><br><span class="line">Start-Service hns</span><br></pre></td></tr></table></figure>
   </div>
 </article>
 
