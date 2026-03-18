@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta property="og:type" content="website">
+<meta property="og:title" content="聊天 | 小桃棉花公主的技术站点">
+<meta property="og:url" content="https://lucency09.github.io/chat/">
+<meta property="og:site_name" content="小桃棉花公主的技术站点">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="小桃棉花公主">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/R2nmBzIIH50h80h8.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/R2nmBzIIH50h80h8.jpg" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/R2nmBzIIH50h80h8.jpg">
+        
+      
+    
+    <!-- title -->
+    <title>聊天 | 小桃棉花公主的技术站点</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+	<!-- custom blockquote styles -->
+	<style>
+		.content blockquote {
+			margin: 1rem 10px !important;
+			padding: 0.5em 10px !important;
+			background: #fff9e6 !important;
+			color: #666 !important;
+			font-weight: bold !important;
+			border-left: 4px solid #ff4444 !important;
+			font-style: italic !important;
+			quotes: none !important;
+		}
+		
+		.content blockquote:before {
+			content: none !important;
+			display: none !important;
+		}
+		
+		.content blockquote p {
+			margin: 0 !important;
+		}
+
+		/* Chat styles */
+		#chat-container {
+			max-width: 700px;
+			margin: 0 auto;
+			padding: 1rem 0;
+		}
+
+		#chat-container h1 {
+			font-size: 1.5rem;
+			margin-bottom: 0.5rem;
+		}
+
+		#chat-container .chat-intro {
+			color: #888;
+			font-size: 0.9rem;
+			margin-bottom: 1.5rem;
+		}
+
+		#chat-messages {
+			border: 1px solid #e0e0e0;
+			border-radius: 8px;
+			padding: 1rem;
+			min-height: 300px;
+			max-height: 420px;
+			overflow-y: auto;
+			background: #fafafa;
+			margin-bottom: 1rem;
+			display: flex;
+			flex-direction: column;
+			gap: 0.75rem;
+		}
+
+		.chat-message {
+			display: flex;
+			flex-direction: column;
+			max-width: 80%;
+		}
+
+		.chat-message.me {
+			align-self: flex-end;
+			align-items: flex-end;
+		}
+
+		.chat-message.other {
+			align-self: flex-start;
+			align-items: flex-start;
+		}
+
+		.chat-message .bubble {
+			padding: 0.5rem 0.9rem;
+			border-radius: 16px;
+			font-size: 0.95rem;
+			line-height: 1.4;
+			word-break: break-word;
+		}
+
+		.chat-message.me .bubble {
+			background: #4a90d9;
+			color: #fff;
+			border-bottom-right-radius: 4px;
+		}
+
+		.chat-message.other .bubble {
+			background: #e8e8e8;
+			color: #333;
+			border-bottom-left-radius: 4px;
+		}
+
+		.chat-message .meta {
+			font-size: 0.75rem;
+			color: #aaa;
+			margin-top: 2px;
+		}
+
+		#chat-input-area {
+			display: flex;
+			gap: 0.5rem;
+			align-items: center;
+		}
+
+		#chat-name-input {
+			width: 100px;
+			flex-shrink: 0;
+			padding: 0.5rem 0.75rem;
+			border: 1px solid #ccc;
+			border-radius: 20px;
+			font-size: 0.9rem;
+			outline: none;
+		}
+
+		#chat-text-input {
+			flex: 1;
+			padding: 0.5rem 0.9rem;
+			border: 1px solid #ccc;
+			border-radius: 20px;
+			font-size: 0.95rem;
+			outline: none;
+		}
+
+		#chat-name-input:focus,
+		#chat-text-input:focus {
+			border-color: #4a90d9;
+		}
+
+		#chat-send-btn {
+			padding: 0.5rem 1.1rem;
+			background: #4a90d9;
+			color: #fff;
+			border: none;
+			border-radius: 20px;
+			font-size: 0.95rem;
+			cursor: pointer;
+			white-space: nowrap;
+		}
+
+		#chat-send-btn:hover {
+			background: #357abd;
+		}
+
+		.chat-empty {
+			color: #bbb;
+			text-align: center;
+			margin: auto;
+			font-size: 0.9rem;
+		}
+	</style>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+    <div class="content index py4 h-card">
+        
+          <header id="header">
+  <a class="u-url u-uid" href="/">
+  
+    
+      <img id="logo" alt class="u-logo" src="/images/R2nmBzIIH50h80h8.jpg" />
+    
+  
+    <div id="title">
+      <h1 class="p-name">小桃棉花公主的技术站点</h1>
+    </div>
+  </a>
+  <div id="nav">
+    <ul>
+      <li class="icon">
+        <a href="#" aria-label="目录"><i class="fa-solid fa-bars fa-2x"></i></a>
+      </li>
+      <!--
+     --><li><a href="/">首页</a></li><!--
+   --><!--
+     --><li><a href="/about/">关于</a></li><!--
+   --><!--
+     --><li><a href="/archives/">归档</a></li><!--
+   --><!--
+     --><li><a target="_blank" rel="noopener" href="https://github.com/Lucency09">项目</a></li><!--
+   --><!--
+     --><li><a href="/chat/">聊天</a></li><!--
+   -->
+    </ul>
+  </div>
+</header>
+
+        
+        <div id="chat-container">
+            <h1>聊天</h1>
+            <p class="chat-intro">在这里留言交流，消息保存在本地浏览器中。</p>
+            <div id="chat-messages">
+                <span class="chat-empty" id="chat-empty-hint">暂无消息，快来发第一条吧～</span>
+            </div>
+            <div id="chat-input-area">
+                <input type="text" id="chat-name-input" placeholder="昵称" maxlength="16" />
+                <input type="text" id="chat-text-input" placeholder="输入消息..." maxlength="300" />
+                <button id="chat-send-btn">发送</button>
+            </div>
+        </div>
+
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2025
+    小桃棉花公主
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/Lucency09">项目</a></li><!--
+     --><!--
+       --><li><a href="/chat/">聊天</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/main.js"></script>
+
+<script>
+(function () {
+    var STORAGE_KEY = 'lucency09_chat_messages';
+    var MAX_MESSAGES = 100;
+
+    function loadMessages() {
+        try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveMessages(msgs) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(msgs.slice(-MAX_MESSAGES)));
+        } catch (e) {}
+    }
+
+    function formatTime(ts) {
+        var d = new Date(ts);
+        var pad = function (n) { return n < 10 ? '0' + n : n; };
+        return pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' +
+               pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')
+                  .replace(/"/g, '&quot;');
+    }
+
+    function renderMessages(msgs) {
+        var container = document.getElementById('chat-messages');
+        var emptyHint = document.getElementById('chat-empty-hint');
+        // Remove only message bubbles, keeping the empty hint element intact
+        var bubbles = container.querySelectorAll('.chat-message');
+        bubbles.forEach(function (el) { el.remove(); });
+        if (msgs.length === 0) {
+            emptyHint.style.display = 'block';
+            return;
+        }
+        emptyHint.style.display = 'none';
+        msgs.forEach(function (msg) {
+            var div = document.createElement('div');
+            div.className = 'chat-message me';
+            div.innerHTML =
+                '<div class="bubble">' + escapeHtml(msg.text) + '</div>' +
+                '<div class="meta">' + escapeHtml(msg.name) + ' · ' + formatTime(msg.ts) + '</div>';
+            container.appendChild(div);
+        });
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function sendMessage() {
+        var nameInput = document.getElementById('chat-name-input');
+        var textInput = document.getElementById('chat-text-input');
+        var name = nameInput.value.trim() || '匿名';
+        var text = textInput.value.trim();
+        if (!text) return;
+        var msgs = loadMessages();
+        msgs.push({ name: name, text: text, ts: Date.now() });
+        saveMessages(msgs);
+        renderMessages(loadMessages());
+        textInput.value = '';
+        textInput.focus();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        renderMessages(loadMessages());
+
+        document.getElementById('chat-send-btn').addEventListener('click', sendMessage);
+        document.getElementById('chat-text-input').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    });
+})();
+</script>
+
+</body>
+</html>
